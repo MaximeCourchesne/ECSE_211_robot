@@ -15,14 +15,14 @@ class FireTruck:
     SPEED = 30 / TRAVEL_DURATION
 
     # Diameter of motion in cm, which is distance between the two parallel motors
-    MOTION_DIAMETER = 8
-    # Arc length of 90 degrees of motion in cm/s
-    ARC_LENGTH = (MOTION_DIAMETER * math.pi) / 4
+    MOTION_DIAMETER = 11.5
+    # Arc length of 360 degrees of motion in cm/s
+    MOTION_CIRCUMFERENCE = (MOTION_DIAMETER * math.pi)
 
-    # Desired time should it take for the robot to turn 90 degrees
-    TURN_DURATION = 3
-    # What is the turn rate of the robot in cm/s?
-    TURN_RATE = ARC_LENGTH / TURN_DURATION
+    # Desired time should it take for the robot to turn 360 degrees
+    TURN_DURATION = 12
+    # What is the turn rate of the robot in cm/s for a full rotation?
+    TURN_RATE = MOTION_CIRCUMFERENCE / TURN_DURATION
 
     def __init__(self, left_motor, right_motor, color_sensor) -> None:
         self.left_motor = left_motor
@@ -57,52 +57,39 @@ class FireTruck:
 
         # Wait the full duration to travel 30 cm
         time.sleep(self.TRAVEL_DURATION)
-
+        self.left_motor.set_power(0)
+        self.right_motor.set_power(0)
         # After the duration ends, stop the motors
         self.stop_motors()
 
 
 
-    def turn_right(self, turning_right:bool):
-        """Turn the robot by 90 degrees in a specified direction on the same spot,
-        without changing its coordinates.
+    def turn(self, turn_angle):
+        """Turn the robot by a number of degrees, without changing its coordinates.
         
         Parameters:
-            turning_right (bool) -- True to turn right, False to turn left
+            turn_angle -- Turn a number of degrees clockwise
         """
-        if turning_right:
-            turn_sign = 1
-        else:
-            turn_sign = -1
 
-        # Set the right motor to go backward
-        self.right_motor.set_power(-100 * turn_sign)
-        # Set the left motor to go forward
-        self.right_motor.set_power(100 * turn_sign)
+        
 
-        # How many wheel rotations before we travel the turn rate?
-        rotations = self.TURN_RATE / self.WHEEL_CIRCUMFERENCE
-        degrees_to_turn = rotations * 360
-
+        # How many degrees for the wheels before we travel the fraction of turn rate?
+        degrees_to_turn = (self.TURN_RATE * turn_angle) / self.WHEEL_CIRCUMFERENCE
+        print(degrees_to_turn)
         # Travel self.turn_rate in 1 second
-        self.left_motor.set_dps(degrees_to_turn)
-        self.right_motor.set_dps(degrees_to_turn)
-
+        # Set the right motor to go backward
+        self.right_motor.set_limits(dps=360, power=-50)
+        self.right_motor.set_position_relative(-360)
+        # Set the left motor to go forward
+        self.left_motor.set_limits(dps=360, power=50)
+        self.left_motor.set_position_relative(360)
+        time.sleep(12)
         # Wait for the full turn duration to rotate 90 degrees
-        time.sleep(self.TURN_DURATION)
-
+        # time.sleep(self.TURN_DURATION * (turn_angle / 360))
+        
         # After the duration ends, stop the motors
-        self.stop_motors()
+        # self.stop_motors()
 
-    
-    def find_path(self,target_buildings: list, fire_types: list):
-        """Find the shortest path visiting each building in target_buildings, returns a list of strings
-        containing step by step instructions
-        target_buildings: a list of two item tuples containing positions of buildings on fire
-        fire_types: a list of strings containing the type of extinguishers needed (in order of target_buildings)
-        """
-        #Already implemented by Maxime, function to be adjusted
-        pass
     
     def adjust_direction(self):
         """Adjust the robots position if it ever trails off the line, determined by the color sensor detecting a different color than expected.

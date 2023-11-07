@@ -22,8 +22,8 @@ def findShortestPath(pos_start, pos_end, blocks_not_to_check, order_check_around
         blocks_not_to_check.remove(pos_end)
 
     # functions that takes in a block and adds it's neighbors to blocksToCheckNext. Unless they are in "blocks_not_to_check"
-    def checkAround(block: tuple, parentBlock: tuple, blocksAlreadyVisited: set, dictBlockParents: dict,
-                    blocksToCheckNext: list, arrivedAtEndBlock: bool):
+    def checkAround(block, parentBlock, blocksAlreadyVisited, dictBlockParents,
+                    blocksToCheckNext, arrivedAtEndBlock):
 
         if block not in blocksAlreadyVisited and block[0] >= 0 and block[0] <= 3 and block[1] >= 0 and block[1] <= 3:
             dictBlockParents[block] = parentBlock
@@ -119,7 +119,7 @@ def findRobotPath(block1_position, block1_color, block2_position, block2_color, 
     # returns the smallest path calculated by the cost function
     return min(possible_paths, key=lambda x: cost_path(x))
 
-def calculate_rotations(facing_direction: int, current_block: tuple, next_block: tuple):
+def calculate_rotations(facing_direction, current_block, next_block):
     # function that takes a current direction, a current block and a next block
     # and outputs the rotation in degrees that the robot has to perform
     movement = (next_block[0]-current_block[0], next_block[1]-current_block[1])
@@ -168,10 +168,10 @@ def translate_path_to_movements(path, block1_position, block1_color, block2_posi
         # appending drop off instruction of foward instruction depending on if the position is a drop off position
 
         if next_block in drop_off_positions:
-            list_instructions.append(f"drop_{drop_off_colors[next_block]}")
+            list_instructions.append("drop_" + str(drop_off_colors[next_block]))
             count_dropoff_in_a_row += 1
         else:
-            list_instructions.append("foward")
+            list_instructions.append("forward")
             count_dropoff_in_a_row = 0
 
     return list_instructions
@@ -179,7 +179,12 @@ def translate_path_to_movements(path, block1_position, block1_color, block2_posi
 
 # function that will be imported by other files
 def getRobotMovementList(block1_position, block1_color, block2_position, block2_color, block3_position, block3_color):
+    """Find the shortest path visiting each building in target_buildings, returns a list of strings
+    containing step by step instructions
+    target_buildings: a list of two item tuples containing positions of buildings on fire
+    fire_types: a list of strings containing the type of extinguishers needed (in order of target_buildings)
+    """
     return translate_path_to_movements(findRobotPath(block1_position, block1_color, block2_position, block2_color, block3_position, block3_color), block1_position, block1_color, block2_position, block2_color, block3_position, block3_color)
 
 # Assuming that the robot starts facing north
-print(getRobotMovementList((1, 0), "purple", (3, 2), "red", (2, 1), "green"))
+# print(getRobotMovementList((1, 0), "purple", (3, 2), "red", (2, 1), "green"))
