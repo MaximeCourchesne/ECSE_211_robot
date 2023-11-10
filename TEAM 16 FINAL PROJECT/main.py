@@ -9,67 +9,35 @@ import time
 
 motor_right = Motor("D")
 motor_left = Motor("A")
-color_left = EV3ColorSensor("2")
-color_right = EV3ColorSensor("4")
-FireTruck1 = FireTruck(motor_left, motor_right, color_left,color_right)
+color_left = EV3ColorSensor("1")
+color_right = EV3ColorSensor("2")
+spinner = Motor('B')
+pusher = Motor('C')
+
+FireTruck1 = FireTruck(motor_left, motor_right, color_left,color_right, spinner, pusher)
 
 
-# inputs: block positions and colors
-# outputs: list of instructions for the robot to execute
-# example: print(getRobotMovementList((1, 0), "purple", (3, 2), "red", (2, 1), "green"))
-# >>> [90, 'drop_purple', -90, 'foward', 90, 'foward', -90, 'foward', 90, 'foward', 'drop_red', 90, 'drop_green', 90, 'foward', 'foward', -90, 'foward', 'foward']
 path = getRobotMovementList((1, 0), "purple", (3, 2), "red", (2, 1), "green")
+
+
+FireTruck1.stop_motors()
+#FireTruck1.turn(90)
 print(path)
-    
-#FireTruck1.turn(90)
-#FireTruck1.stop_motors()
-print("adusting")
-FireTruck1.adjust_direction("left")
-print("adjusted")
-'''
-# main loop
-for instruction in path:
-    if isinstance(instruction, int):
-        FireTruck1.turn(instruction)
-        print("turn")
-    elif instruction == "forward":
-        FireTruck1.move_forward()
-        print("forward")
-    elif "drop" in instruction:
-        #FireTruck1.drop()
-        print("drop cube")
-'''
-'''
-while True:
-    colors = FireTruck1.get_colors()
-    if "Red" in colors[0] or "Blue" in colors[0]:
-        FireTruck1.adjust_direction("left")
-    elif "Red" in colors[1] or "Blue" in colors[1]:
-        FireTruck1.adjust_direction("right")
-'''
-print("alegedly turning 90")
-#FireTruck1.turn(90)
-FireTruck1.stop_motors()
-
-"""
-command = input("Enter a command: ")
-while "quit" not in command:
-    FireTruck1.parse_command(command)
-    command = input("Enter a command: ")"""
-
-
-#FireTruck1.turn(90)
-commands = ['forward','left','forward','forward','left','forward','left','forward','forward','left']
-for command in commands:
-    FireTruck1.parse_command(command)
-    time.sleep(2)
+input()
+['yellow','blue','green','red','purple','orange']
+commands = ['forward','drop_yellow', 'turn_left','turn_right','forward']
+for i in range(len(path)):
+    if path[i] == 90:
+        path[i]= "turn_right"
+    elif path[i] == -90:
+        path[i] = 'turn_left'
+commands = path
+for i in range(len(commands)):
+    print("Doing:",str(commands[i]))
+    FireTruck1.parse_command(commands[i])
+    if i != len(commands)-1:
+        print('next command:',commands[i+1])
+    input()
 
 FireTruck1.stop_motors()
 
-
-#FireTRuck1.move_forward()
-    
-        
-    #FireTruck1.move_forward()
-
-#FireTruck1.stop_motors()
