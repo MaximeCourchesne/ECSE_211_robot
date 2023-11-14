@@ -18,15 +18,18 @@ class FireTruck:
         self.pusher = spider_pusher
         self.current_line_color = "Red"
         
-        self.directions = ['n','e','s','w']
-        self.direction_index = 0
-        self.facing_direction =  self.directions[0]
-        #self.spinner.reset_encoder()
         self.suppressant_order = ['blue','yellow','green','red','orange','purple']
 
     def set_color_order(self):
-        order = []
-        colors = input("enter letters of colors").lower()
+        '''Helper method for setting the order of the colored cubes
+        Used only for testing, default order is written in initialization
+        Takes input of letters indicatin which color to append to order of extinguishers
+        '''
+        #Order of extinguishers to set
+        order = [] 
+        
+        #Take input of letters, in lowercase, only first 6 letters
+        colors = input("enter letters of colors").lower()[:6] 
         for l in colors:
             if l == 'b':
                 order.append("blue")
@@ -43,9 +46,13 @@ class FireTruck:
             else:
                 print("invalid input: ",l)
                 continue
-            self.suppressant_order = order
+            
+        #Set robot's order to input order
+        self.suppressant_order = order
+
+
     def stop_motors(self):
-        """Stop all motors from rotating"""
+        """Stop all motors from rotating in a single command"""
 
         self.left_motor.set_dps(0)
         self.right_motor.set_dps(0)
@@ -53,9 +60,16 @@ class FireTruck:
         self.right_motor.set_power(0)
 
     def reverse_off_green(self):
-        print("AOWEJDpaodwe")
+        '''
+        Called when robots stopped with sensors on the green square
+        Reverses until sensors do not detect green anymore
+        '''
+
+        #Set movement motors powers
         self.left_motor.set_power(100)
         self.right_motor.set_power(100)
+        
+        #Continuous movement in reverse until green is no longer detected
         colors = self.get_colors()
         while 'Green' in colors:
             print(colors, 'waiting to leave green')
@@ -66,29 +80,42 @@ class FireTruck:
                 self.adjust_direction("right")
             self.left_motor.set_dps(-360)
             self.right_motor.set_dps(-360)
+        
+        #Stop movement once off green
         self.stop_motors()
             
     def move_until_green(self, backwards = False):
+        '''
+        Called when robot's sensors are not on green squares
+        Takes input a boolean "backwards", indicating movement in reverse if True, default False
+        Moves in specified direction until sensors detect a green square
+        '''
+        #Set movement motors power
         self.left_motor.set_power(60)
         self.right_motor.set_power(60)
+        
+        #Set negative direction if movement is in reverse
         direction =1
         if backwards:
             direction = -1
+        
+        #Continuous movement in specified direction until green detected
         colors = self.get_colors()
-
         while "Green" not in colors:
             colors = self.get_colors()
-            if self.current_line_color in colors[0]:
-                self.adjust_direction("left")
-            elif self.current_line_color in colors[1]:
-                self.adjust_direction("right")
+            self.auto_adjust()
             self.left_motor.set_dps(360*direction)
             self.right_motor.set_dps(360*direction)
+        
+        #Stop motors once green detected
         self.stop_motors()
     
     def center_on_green(self):
-        
-        colors = []
+        '''
+        Called when robot's sensors are on green. Moves forwards by an estimated 3cm.
+        Used to center robot's center directly above the green square
+        '''
+        #Continuous movement forward until green no longer detected
         colors = self.get_colors()
         while "Green" in colors:
             colors = self.get_colors()
@@ -100,9 +127,9 @@ class FireTruck:
             self.right_motor.set_dps(360)
         self.stop_motors()
     
+        #Hardcoded movement forward by an estimated 4 cm
         count_extra_loops=0
-        while count_extra_loops<200: #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-            #print(count_extra_loops)
+        while count_extra_loops<200:
             colors = self.get_colors()
             if self.current_line_color in colors[0]:
                 self.adjust_direction("left")
@@ -114,7 +141,7 @@ class FireTruck:
         self.stop_motors()
     
     
-    def move_forward(self):
+    '''def move_forward(self):
         """Move the robot forward by 1 edge, 30 cm, by rotating the motors."""
         self.left_motor.set_power(100)
         self.right_motor.set_power(100)
@@ -138,130 +165,168 @@ class FireTruck:
             self.left_motor.set_dps(360)
             self.right_motor.set_dps(360)
             count_extra_loops+=1
-        self.stop_motors()
+        self.stop_motors()'''
+
+    def turn_off_line(self):
+        '''Turns robot counter-clockwise by an estimated 90 degrees mathematically
+        Used when calling a 180 turn, to avoid automatically adjusting to lines'''
+        
+        #Set motor limits
+        self.left_motor.set_limits(dps=360)
+        self.right_motor.set_limits(dps=360)
+        
+        #Turn by estimated 90 degrees without checking for lines
+        self.left_motor.set_position_relative(360)
+        self.right_motor.set_position_relative(-360)
+        time.sleep(0.5)
 
     def turn_until_line(self):
+        '''Turns robot counter-clockwise until the facing direction line is detected.
+        Auto adjusts to detected line.
+        Used in calling a 180 turn to complete the turn.'''
+        
+        #Set movement motor limits
         self.left_motor.set_limits(power=70, dps=360)
         self.right_motor.set_limits(power=70, dps=360)
+
+        #Continuous rotation  until target color is detected
         colors = self.get_colors()
         while self.current_line_color not in colors:
             colors = self.get_colors()
             self.left_motor.set_position_relative(360)
             self.right_motor.set_position_relative(-360)
+        
+        #Stop motors and adjust to newly detected line
         self.stop_motors()
         self.auto_adjust()
         time.sleep(0.5)
         
-    def turn_off_line(self):
-        self.left_motor.set_limits(dps=360)
-        self.right_motor.set_limits(dps=360)
-        
-        self.left_motor.set_position_relative(360)
-        self.right_motor.set_position_relative(-360)
-        time.sleep(0.5)
     def spin_to_color(self, color):
+        '''
+        Takes as input 'color': name of the color to spin to
+        Spins the robot's color choosing spinner motor to a color's position,
+            aligning the specified color directly below the color pusher
+        '''
+        #Set spinner limits
         self.spinner.set_limits(dps=360,power=80)
+        #Index at which color is in robot's order of colors
         index = self.suppressant_order.index(color)
+        
+        #Case where color is not found in order of colors
         if index == -1:
             return index
-        print('spinning to ', color)
-        
+
+        #Set spinner to position of color        
         self.spinner.set_position(index * 60 *-1)
-        time.sleep(1)
+        
+        #Estimated time to complete setting position
+        time.sleep(0.5)
         return index
+    
     def push_color(self):
+        '''Spins the robot's cube pushing arm by 360 degrees
+        Called once the spin_to_color is complete.
+        Arm spins and pushes cube beneath it into the funnel'''
+        
+        #Set arm limit
         self.pusher.set_limits(power=80, dps=360)
+        
+        #Spin arm counter-clockwise
         self.pusher.set_position_relative(-360)
         
-        time.sleep(1.5)        
+        #Estimated time for cube to fall through funnel
+        time.sleep(1.5)  
+
+        #Reset spinner to original position      
         self.spinner.set_position(0)
 
     def get_colors(self):
+        '''Returns a tuple of the colors detected by the left and right color
+            sensors respectively.'''
+        
         return (self.color_sensor_left.get_color_name(), self.color_sensor_right.get_color_name())
     
-    def turn(self, turn_angle):
-        """Turn the robot by a number of degrees, without changing its coordinates.
+    def turn(self, direction):
+        '''Takes as input 'direction': 90 or -90 
+        Flips the robot's target line color between Red/Blue
+        Positive direction indicates clockwise turning, negative indicates CC
+        Turns robot in specified direction until target color is detected
+        Calls auto-adjust function to adjust on new line'''
+                
+        #Toggle the target line's color
+        if self.current_line_color == 'Blue':
+            self.current_line_color = 'Red'
+        else:
+            self.current_line_color = 'Blue'
         
-        Parameters:
-            turn_angle -- Turn a number of degrees clockwise
-        """
-        if turn_angle == -90:
-            self.direction_index -= 1
-        elif turn_angle == 90:
-            self.direction_index += 1
-        if self.direction_index < 0:
-            self.direction_index = 3
-        elif self.direction_index > 3:
-            self.direction_index = 0
-        
-        toFlip = False
-        if abs(turn_angle) == 90:
-            if self.current_line_color == 'Blue':
-                self.current_line_color = 'Red'
-            else:
-                self.current_line_color = 'Blue'
-        
-        
-        print("following " + self.current_line_color)
-        
-        movement = 4 * turn_angle
-        
-        
+        #Set motor's limits for turning
         self.right_motor.set_limits(power=80, dps=360)
         self.left_motor.set_limits(power=80, dps=360)
         
+        #Amount to turn by repeatedly
+        movement = 4 * direction
         colors = self.get_colors()
-        # turn until you see a line of the desired color
+        #Loop until target color is detected
         while self.current_line_color not in colors:
             colors = self.get_colors()
             self.right_motor.set_position_relative(-1 * movement)
             self.left_motor.set_position_relative(movement)
+        #Adjust with the detected color after turn
         self.auto_adjust()
         
-    def math_turn(self):
-        self.right_motor.set_limits(power=70, dps=360)
-        self.left_motor.set_limits(power=70,dps=360)
-        self.right_motor.set_position_relative(360)
-        self.left_motor.set_position_relative(-1*360)
-        time.sleep(2)
     
     def auto_adjust(self):
+        '''
+        Automatically check if adjustment is needed and call directional adjust functions
+        Gets detected colors and checks if the target line color is in either of them
+        '''
+        #Initialize value of colors 
         colors = self.get_colors()
         if self.current_line_color in colors[0]:
+            #Left sensor detected target color
             self.adjust_direction("left")
         elif self.current_line_color in colors[1]:
+            #Right sensor detected target color
             self.adjust_direction("right")
             
     def adjust_direction(self, direction):
-        """Adjust the robots position if it ever trails off the line, determined by the color sensor detecting a different color than expected.
-        Initial idea is to spin the robot to the left by 20 degrees to check if the line is in the 20 degrees to its left 
-            (assumes it went off on the right side of the street line). If line is found, continue previous instruction
-        Else, spin to right by 20 degrees to reset, and then another 20 degrees to the right to check if line is in the 20 degrees
-            to its right (assumes it went off on the left side of the street lane)
-        """
+        '''
+        Takes as input 'direction': String 'left' or right'
+        Turns in specified direction until the specified direction's respective sensor
+            no longer detects the target line color.
+        '''
+        
+        #Set motor limits for turning
         self.left_motor.set_limits(dps=360, power=100)
         self.right_motor.set_limits(dps=360, power=100)
-        print(self.color_sensor_left.get_color_name())
-        print(self.color_sensor_right.get_color_name())
+
+        #Execution of adjusting to the left
         if direction == "left":
-            print("turning")
+            #Infinite loop until target color no longer detected
             while self.current_line_color in self.color_sensor_left.get_color_name():
                 self.left_motor.set_position_relative(-10)
                 self.right_motor.set_position_relative(10)
+            #Minor extra adjustment after moving off color
             self.left_motor.set_position_relative(-60)
             self.right_motor.set_position_relative(60)
 
-        if direction == "right":
-            print("turning")
+        #Execution of adjusting to the right
+        elif direction == "right":
+            #Infinite loop until target color no longer detected
             while self.current_line_color in self.color_sensor_right.get_color_name():
-                
                 self.left_motor.set_position_relative(10)
                 self.right_motor.set_position_relative(-10)
+            #Minor extra adjustment after moving off color
             self.left_motor.set_position_relative(60)
             self.right_motor.set_position_relative(-60)
         
         
     def parse_command(self, command):
+        '''
+        Takes as input 'command': String indicating a command for the robot to execute
+        Detects if any valid commands are in the input, and executes the required methods accordingly
+        Stops the robot if no valid commands are detected in the command
+        '''
         if "forward" in command:
             self.move_until_green()
             self.center_on_green()
@@ -287,24 +352,6 @@ class FireTruck:
             print("invalid command")
 
 if __name__ == "__main__":
-    #conduct any testing here
-    print("Running main...")
-    motor_right = Motor("D")
-    motor_left = Motor("A")
-    color_left = EV3ColorSensor("1")
-    color_right = EV3ColorSensor("2")
-    spinner = Motor('B')
-    pusher = Motor('C')
-    wait_ready_sensors()
-    #spinner.set_position_relative(60)
-    FireTruck1 = FireTruck(motor_left, motor_right, color_left,color_right, spinner, pusher)
-
-    commands = ['drop_purple', 'drop_blue']
-    input()
-    for command in commands:
-        print(command)
-        time.sleep(0.5)
-        FireTruck1.parse_command(command)
-    time.sleep(1)
-    FireTruck1.stop_motors()
-
+    test = '0123456'
+    print(test[:6])
+    pass
