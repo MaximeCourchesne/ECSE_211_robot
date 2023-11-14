@@ -23,8 +23,9 @@ class FireTruck:
     def set_color_order(self):
         '''Helper method for setting the order of the colored cubes
         Used only for testing, default order is written in initialization
-        Takes input of letters indicatin which color to append to order of extinguishers
+        Takes input of letters indicating which color to append to order of extinguishers
         '''
+
         #Order of extinguishers to set
         order = [] 
         
@@ -46,7 +47,7 @@ class FireTruck:
             else:
                 print("invalid input: ",l)
                 continue
-            
+
         #Set robot's order to input order
         self.suppressant_order = order
 
