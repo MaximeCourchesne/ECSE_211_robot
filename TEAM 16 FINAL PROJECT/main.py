@@ -17,27 +17,30 @@ pusher = Motor('C')
 FireTruck1 = FireTruck(motor_left, motor_right, color_left,color_right, spinner, pusher)
 
 
-path = getRobotMovementList((1, 0), "purple", (3, 2), "red", (2, 1), "green")
-
+#path = getRobotMovementList((2, 2), "purple", (3, 3), "red", (3, 0), "green")
+path = getRobotMovementList((1, 0), "yellow", (1, 1), "orange", (0, 2), "blue")
 
 FireTruck1.stop_motors()
-#FireTruck1.turn(90)
+#print(path)
+
 print(path)
-input()
-['yellow','blue','green','red','purple','orange']
-commands = ['forward','drop_yellow', 'turn_left','turn_right','forward']
 for i in range(len(path)):
     if path[i] == 90:
         path[i]= "turn_right"
     elif path[i] == -90:
         path[i] = 'turn_left'
+    elif path[i] == 180 or path[i] == -180:
+        path[i] = 'flip'
+        
 commands = path
+print(commands)
+input("Enter to start.")
 for i in range(len(commands)):
     print("Doing:",str(commands[i]))
     FireTruck1.parse_command(commands[i])
     if i != len(commands)-1:
         print('next command:',commands[i+1])
-    input()
+    time.sleep(0.5)
 
 FireTruck1.stop_motors()
 
