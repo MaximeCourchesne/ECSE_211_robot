@@ -4,9 +4,6 @@ from utils.brick import Motor
 from utils.brick import wait_ready_sensors, EV3ColorSensor, EV3UltrasonicSensor, TouchSensor
 import time
 
-#color_sensor = EV3ColorSensor(1) # port S1
-#wait_ready_sensors()
-
 motor_right = Motor("D")
 motor_left = Motor("A")
 color_left = EV3ColorSensor("1")
@@ -21,7 +18,6 @@ FireTruck1 = FireTruck(motor_left, motor_right, color_left,color_right, spinner,
 path = getRobotMovementList((1, 0), "yellow", (1, 1), "orange", (0, 2), "blue")
 
 FireTruck1.stop_motors()
-#print(path)
 
 print(path)
 for i in range(len(path)):
