@@ -1,0 +1,48 @@
+class FireTruck {
+	state {
+      executingInstructions{
+      
+      idle{
+        moveForward -> movingForward;
+        turnRight -> RotaryMotion;
+ 		turnLeft -> RotaryMotion;
+        flip -> turningOffLine;
+        dropCube -> DroppingCube;
+      }
+        LinearMotion{
+          greenDetected -> centeringOnGreen;
+          lineDetected -> adjusting;
+
+          movingForward{}
+          reversing{
+              nearingEdge -> centeringOnGreen;
+          }
+          centeringOnGreen{
+              afterTwoSeconds -> executingInstructions;
+          }
+
+        }
+		
+       RotaryMotion{
+       	turnDone -> idle;
+       	turning{}
+      
+      	turningOffLine{
+          afterTwoSeconds -> turning;
+          }
+       	}
+        DroppingCube{
+      	moveForward{greenDetected->selectAndDrop;
+                   	lineDetected -> adjusting;}
+        selectAndDrop{after2Seconds -> reversing;}
+        
+      }
+      }
+         adjusting{
+        lineNotDetected -> executingInstructions.HStar;
+      }
+      
+    }     
+}
+
+Copy-pasterino above in umpleOnline for the graph
