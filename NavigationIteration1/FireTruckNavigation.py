@@ -1,7 +1,6 @@
 """Module containing class object that handles navigation."""
 import math
 import time
-#TODO Change all docstrings to smt more descriptive
 
 class FireTruck:
     """Class object for system that implements navigation methods."""
@@ -75,7 +74,6 @@ class FireTruck:
 
         # How many degrees for the wheels before we travel the fraction of turn rate?
         degrees_to_turn = (self.TURN_RATE * turn_angle) / self.WHEEL_CIRCUMFERENCE
-        print(degrees_to_turn)
         # Travel self.turn_rate in 1 second
         # Set the right motor to go backward
         self.right_motor.set_limits(dps=360, power=-50)
