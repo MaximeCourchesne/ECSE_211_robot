@@ -1,4 +1,7 @@
 #===================================================================
+# Note: This code is a very early version of "Navigation". Please
+# refer to the newest file that can be found at ../"Final Iteration"/FireTruckNavigation.py
+#
 # Created by Maxime Courchesne, Behrad Rezaie, Michael Popescu, Le-Tao Li
 # As part of the course ECSE 211, McGill University
 #
@@ -7,6 +10,7 @@
 #
 #
 #===================================================================
+
 
 """Module containing class object that handles navigation."""
 import math
@@ -20,7 +24,7 @@ class FireTruck:
 
     # Desired time should it take for the robot to travel 30 cm in seconds
     TRAVEL_DURATION = 3
-    # What is the speed of the robot in cm/s?
+    # Speed of the robot in cm/s
     SPEED = 30 / TRAVEL_DURATION
 
     # Diameter of motion in cm, which is distance between the two parallel motors
@@ -30,7 +34,7 @@ class FireTruck:
 
     # Desired time should it take for the robot to turn 360 degrees
     TURN_DURATION = 12
-    # What is the turn rate of the robot in cm/s for a full rotation?
+    # Turn rate of the robot in cm/s for a full rotation
     TURN_RATE = MOTION_CIRCUMFERENCE / TURN_DURATION
 
     def __init__(self, left_motor, right_motor, color_sensor) -> None:
@@ -100,18 +104,17 @@ class FireTruck:
 
     
     def adjust_direction(self):
+        # This function was not implemented yet in this iteration of the software
         """Adjust the robots position if it ever trails off the line, determined by the color sensor detecting a different color than expected.
         Initial idea is to spin the robot to the left by 20 degrees to check if the line is in the 20 degrees to its left 
             (assumes it went off on the right side of the street line). If line is found, continue previous instruction
         Else, spin to right by 20 degrees to reset, and then another 20 degrees to the right to check if line is in the 20 degrees
             to its right (assumes it went off on the left side of the street lane)
-        
         """
         # Doesn't have to be 20 degrees, have to account for edge cases, many tests involved
         pass
     
         
 if __name__ == "__main__":
-    #conduct any testing here
     print("Running main...")
     pass
