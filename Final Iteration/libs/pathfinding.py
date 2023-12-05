@@ -2,7 +2,7 @@
 # Created by Maxime Courchesne, Behrad Rezaie
 # As part of the course ECSE 211, McGill University
 #
-# Last modified by Maxime Courchesne on November 25th 11:35
+# Last modified by Maxime Courchesne on December 12th 4:35
 # Reason: cleaned up unnecessary comments, print statements and made
 # the code easier to read
 #

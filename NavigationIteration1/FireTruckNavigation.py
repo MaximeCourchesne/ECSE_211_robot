@@ -1,3 +1,13 @@
+#===================================================================
+# Created by Maxime Courchesne, Behrad Rezaie, Michael Popescu, Le-Tao Li
+# As part of the course ECSE 211, McGill University
+#
+# Last modified by Maxime Courchesne on December 12th 4:36
+# Reason: Removed useless comments
+#
+#
+#===================================================================
+
 """Module containing class object that handles navigation."""
 import math
 import time

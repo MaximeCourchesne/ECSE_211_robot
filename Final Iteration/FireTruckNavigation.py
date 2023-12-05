@@ -2,7 +2,7 @@
 # Created by Maxime Courchesne, Behrad Rezaie, Michael Popescu, Le-Tao Li
 # As part of the course ECSE 211, McGill University
 #
-# Last modified by Maxime Courchesne on December 6th 2:35
+# Last modified by Maxime Courchesne on December 12th 4:35
 # Reason: Remove useless comments and testing code, add spacings to improve readability
 #
 #
