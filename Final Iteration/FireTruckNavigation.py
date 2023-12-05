@@ -1,32 +1,37 @@
-"""Module containing class object that handles navigation."""
+#===================================================================
+# Created by Maxime Courchesne, Behrad Rezaie, Michael Popescu, Le-Tao Li
+# As part of the course ECSE 211, McGill University
+#
+# Last modified by Maxime Courchesne on December 6th 2:35
+# Reason: Remove useless comments and testing code, add spacings to improve readability
+#
+#
+#===================================================================
+
+
 import math
 import time
 from utils.brick import Motor
 from utils.brick import wait_ready_sensors, EV3ColorSensor, EV3UltrasonicSensor, TouchSensor
-#TODO Change all docstrings to smt more descriptive
+
 
 class FireTruck:
     """Class object for system that implements navigation methods."""
     def __init__(self, left_motor, right_motor, color_sensor_left, color_sensor_right,
                  spider_spinner, spider_pusher, distance_sensor) -> None:
+        # initialization instance variables
+
         self.left_motor = left_motor
         self.right_motor = right_motor
-        
-
-        
         self.color_sensor_left = color_sensor_left
         self.color_sensor_right = color_sensor_right
         
         self.spinner = spider_spinner
-        
         self.reverse_sensor = distance_sensor
-        
         
         self.pusher = spider_pusher
         self.current_line_color = "Red"
-        
-        self.suppressant_order = ['yellow','green','red','orange','purple','blue']
-        
+                
         self.power = 90
         self.movement_speed = 270
         
@@ -35,7 +40,13 @@ class FireTruck:
         self.left_motor.set_limits(power=self.power)
         self.pusher.set_limits(power=self.power)
 
+        # order in which we will have to place the suppressants on the robot
+        self.suppressant_order = ['yellow','green','red','orange','purple','blue']
+
     def adjust_spinner(self):
+        '''
+        Function to adjust the robot's "spinner" which is where the cubes are placed. This will be used before the main function starts(before the robot starts delivering the suppressants).
+        '''
         adjustment = input("Enter degrees to turn by, or X to exit")
         while adjustment.isnumeric():
             self.spinner.set_position_relative(int(adjustment))
@@ -74,7 +85,7 @@ class FireTruck:
 
 
     def stop_motors(self):
-        """Stop all motors from rotating in a single command"""
+        '''Function to stop all motors from rotating in a single command'''
 
         self.left_motor.set_dps(0)
         self.right_motor.set_dps(0)
@@ -83,8 +94,7 @@ class FireTruck:
 
     def reverse_off_green(self):
         '''
-        Called when robots stopped with sensors on the green square
-        Reverses until sensors do not detect green anymore
+        Function that reverses until sensors do not detect green anymore. 
         '''
 
         #Set movement motors powers
@@ -108,9 +118,9 @@ class FireTruck:
             
     def move_until_green(self, backwards = False):
         '''
-        Called when robot's sensors are not on green squares
-        Takes input a boolean "backwards", indicating movement in reverse if True, default False
+        Method that can takes input a boolean "backwards" as input, indicating movement in reverse.
         Moves in specified direction until sensors detect a green square
+        Called when robot's sensors are not on green squares
         '''
         #Set movement motors power
         self.left_motor.set_power(self.power)
@@ -143,7 +153,7 @@ class FireTruck:
     
     def center_on_green(self):
         '''
-        Called when robot's sensors are on green. Moves forwards by an estimated 3cm.
+        Method that is called when robot's sensors are on green. Moves forwards by 3cm.
         Used to center robot's center directly above the green square
         '''
         #Continuous movement forward until green no longer detected
@@ -194,7 +204,7 @@ class FireTruck:
         self.left_motor.set_limits(power=self.power, dps=self.movement_speed)
         self.right_motor.set_limits(power=self.power, dps=self.movement_speed)
 
-        #Continuous rotation  until target color is detected
+        #Continuous rotation until the "drop-off" zone is detected
         colors = self.get_colors()
         while self.current_line_color not in colors:
             colors = self.get_colors()
@@ -210,7 +220,7 @@ class FireTruck:
         '''
         Takes as input 'color': name of the color to spin to
         Spins the robot's color choosing spinner motor to a color's position,
-            aligning the specified color directly below the color pusher
+        aligning the specified color directly below the color pusher
         '''
         #Set spinner limits
         #Index at which color is in robot's order of colors
@@ -248,18 +258,21 @@ class FireTruck:
 
 
     def get_colors(self):
-        '''Returns a tuple of the colors detected by the left and right color
-            sensors respectively.'''
+        '''
+        Returns a tuple of the colors detected by the left and right color
+        sensors respectively.
+        '''
         colors = (self.color_sensor_left.get_color_name(), self.color_sensor_right.get_color_name())
         
-        return (self.color_sensor_left.get_color_name(), self.color_sensor_right.get_color_name())
     
     def turn(self, direction):
-        '''Takes as input 'direction': 90 or -90 
+        '''
+        Takes as input 'direction': 90 or -90 
         Flips the robot's target line color between Red/Blue
         Positive direction indicates clockwise turning, negative indicates CC
         Turns robot in specified direction until target color is detected
-        Calls auto-adjust function to adjust on new line'''
+        Calls auto-adjust function to adjust on new line
+        '''
                 
         #Toggle the target line's color
         if self.current_line_color == 'Blue':
@@ -296,11 +309,12 @@ class FireTruck:
         elif self.current_line_color in colors[1]:
             #Right sensor detected target color
             self.adjust_direction("right")
+
     def adjust_direction(self, direction):
         '''
         Takes as input 'direction': String 'left' or right'
         Turns in specified direction until the specified direction's respective sensor
-            no longer detects the target line color.
+        no longer detects the target line color.
         '''
         
         #Set motor limits for turning
@@ -326,7 +340,6 @@ class FireTruck:
             #Minor extra adjustment after moving off color
             self.left_motor.set_position_relative(60)
             self.right_motor.set_position_relative(-60)
-        
         
     def parse_command(self, command):
         '''
@@ -362,26 +375,3 @@ class FireTruck:
             self.stop_motors()
             print("invalid command")
 
-if __name__ == "__main__":
-    test = '0123456'
-    print(test[:6])
-    
-    motor_right = Motor("D")
-    motor_left = Motor("A")
-    color_left = EV3ColorSensor("1")
-    color_right = EV3ColorSensor("2")
-    spinner = Motor('B')
-    pusher = Motor('C')
-    ultrasonic_sensor = EV3UltrasonicSensor('3')
-
-    wait_ready_sensors()
-
-    print(ultrasonic_sensor.get_cm())
-    FireTruck1 = FireTruck(motor_left, motor_right, color_left,
-                           color_right, spinner, pusher, ultrasonic_sensor)
-    
-    commands = ['drop_yellow',"turn_right", "drop_red"]
-    FireTruck1.adjust_spinner()
-    for command in commands:
-       FireTruck1.parse_command(command)
-    time.sleep(1)

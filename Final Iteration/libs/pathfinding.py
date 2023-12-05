@@ -1,7 +1,8 @@
 #===================================================================
-# Created by Maxime Courchesne, McGill University
+# Created by Maxime Courchesne, Behrad Rezaie
+# As part of the course ECSE 211, McGill University
 #
-# Last modified by Maxime Courchesne on October 29th 11:35
+# Last modified by Maxime Courchesne on November 25th 11:35
 # Reason: cleaned up unnecessary comments, print statements and made
 # the code easier to read
 #
@@ -24,13 +25,15 @@ def findShortestPath(pos_start, pos_end, blocks_not_to_check, order_check_around
     # functions that takes in a block and adds it's neighbors to blocksToCheckNext. Unless they are in "blocks_not_to_check"
     def checkAround(block, parentBlock, blocksAlreadyVisited, dictBlockParents,
                     blocksToCheckNext, arrivedAtEndBlock):
-
+        # if the neighbors are path of the "map", we add them to the next breadth
         if block not in blocksAlreadyVisited and block[0] >= 0 and block[0] <= 3 and block[1] >= 0 and block[1] <= 3:
             dictBlockParents[block] = parentBlock
             blocksAlreadyVisited.add(block)
             blocksToCheckNext.append(block)
 
+
     arrivedAtEndBlock = False
+    # main loop of the BFS algorithm. It stops when the algorithm arrives at the end block.
     while not arrivedAtEndBlock:
         for block in blocksToCheckNext:
             if block == pos_end:
@@ -44,6 +47,7 @@ def findShortestPath(pos_start, pos_end, blocks_not_to_check, order_check_around
 
     pathComputed = False
     next_block = pos_end
+    # The purpose tf this loop is to extract the path from the "dictBlockParents" dictionary.
     while not pathComputed:
         # dictBlockParents will never be 0 so the following if statement could be erased
         if len(dictBlockParents) == 0:
@@ -57,7 +61,7 @@ def findShortestPath(pos_start, pos_end, blocks_not_to_check, order_check_around
     # So that the returned list is in order and contains start/end blocks
     listFinalPath = list(reversed(listFinalPath))
     listFinalPath.append(pos_end)
-    # So that the arguments are not modified
+    # So that the arguments are not modified (we had to remove pos_end at the beginning of the function)
     blocks_not_to_check.add(pos_end)
     return listFinalPath
 
@@ -83,33 +87,27 @@ def findRobotPath(block1_position, block1_color, block2_position, block2_color, 
         fourth_path = findShortestPath(third_path[-2], (0, 0), block_positions)
         return first_path + second_path[1:] + third_path[1:] + fourth_path[1:]
 
-    # cost function for a given path
-
 
     possible_paths = []
-    # @@@@@@@@@@@@@ appending path for each permutation to list of paths @@@@@@@@@@@@@
-    # @@@@@@@@@@@@@ 1, 2, 3 @@@@@@@@@@@@
-    # initializing as the path to block 1
-    # path_1_2_3 = findPathForPermutation(path_b0_to_b1, block2_position, block3_position, block_positions)
+    # Appending a path for each permutation to list of paths. There will be 6 different paths
+    # since there are 6 possible orders in which to drop off the supressants.
+
+    # permutation: 1, 2, 3 
     possible_paths.append(tuple(findPathForPermutation(path_b0_to_b1, block2_position, block3_position, block_positions)))
-    # @@@@@@@@@@@@@ 1, 3, 2 @@@@@@@@@@@@@
-    # path_1_3_2 = findPathForPermutation(path_b0_to_b1, block3_position, block2_position, block_positions)
+
+    # permutation: 1, 3, 2 
     possible_paths.append(tuple(findPathForPermutation(path_b0_to_b1, block3_position, block2_position, block_positions)))
 
-    # @@@@@@@@@@@@@ 2, 1, 3 @@@@@@@@@@@@@
-    # path_2_1_3 = findPathForPermutation(path_b0_to_b2, block1_position, block3_position, block_positions)
+    # permutation: 2, 1, 3 
     possible_paths.append(tuple(findPathForPermutation(path_b0_to_b2, block1_position, block3_position, block_positions)))
 
-    # @@@@@@@@@@@@@ 2, 3, 1 @@@@@@@@@@@@@
-    # path_2_3_1 = findPathForPermutation(path_b0_to_b2, block3_position, block1_position, block_positions)
+    # permutation: 2, 3, 1 
     possible_paths.append(tuple(findPathForPermutation(path_b0_to_b2, block3_position, block1_position, block_positions)))
 
-    # @@@@@@@@@@@@@ 3, 2, 1 @@@@@@@@@@@@@
-    # path_3_1_2 = findPathForPermutation(path_b0_to_b3, block2_position, block1_position, block_positions)
+    # permutation: 3, 2, 1 
     possible_paths.append(tuple(findPathForPermutation(path_b0_to_b3, block2_position, block1_position, block_positions)))
 
-    # @@@@@@@@@@@@@ 3, 1, 2 @@@@@@@@@@@@@
-    # path_3_2_1 = findPathForPermutation(path_b0_to_b3, block1_position, block2_position, block_positions)
+    # permutation: 3, 1, 2 
     possible_paths.append(tuple(findPathForPermutation(path_b0_to_b3, block1_position, block2_position, block_positions)))
 
     # Determine the "cost" of each path
@@ -179,12 +177,9 @@ def translate_path_to_movements(path, block1_position, block1_color, block2_posi
 
 # function that will be imported by other files
 def getRobotMovementList(block1_position, block1_color, block2_position, block2_color, block3_position, block3_color):
-    """Find the shortest path visiting each building in target_buildings, returns a list of strings
-    containing step by step instructions
-    target_buildings: a list of two item tuples containing positions of buildings on fire
-    fire_types: a list of strings containing the type of extinguishers needed (in order of target_buildings)
-    """
-    return translate_path_to_movements(findRobotPath(block1_position, block1_color, block2_position, block2_color, block3_position, block3_color), block1_position, block1_color, block2_position, block2_color, block3_position, block3_color)
-
-# Assuming that the robot starts facing north
-# print(getRobotMovementList((1, 0), "purple", (3, 2), "red", (2, 1), "green"))
+    '''Find the shortest path visiting each building in target_buildings, returns a list of strings
+    containing step by step instructions'''
+    # target_buildings: a list of two item tuples containing positions of buildings on fire
+    # fire_types: a list of strings containing the type of extinguishers needed (in order of target_buildings)
+    final_path = findRobotPath(block1_position, block1_color, block2_position, block2_color, block3_position, block3_color)
+    return translate_path_to_movements(final_path, block1_position, block1_color, block2_position, block2_color, block3_position, block3_color)
