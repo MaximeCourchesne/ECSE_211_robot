@@ -1,3 +1,13 @@
+#===================================================================
+# Created by Behrad Rezaie, Maxime Courchesne
+# As part of the course ECSE 211, McGill University
+#
+# Last modified by Maxime Courchesne on December 12th 4:39
+# Reason: Remove useless comments and testing code, add spacings to improve readability
+#
+#
+#===================================================================
+
 from NavigationIteration1.FireTruckNavigation import FireTruck
 from libs.pathfinding import getRobotMovementList
 from utils.brick import Motor
