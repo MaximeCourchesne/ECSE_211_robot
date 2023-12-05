@@ -44,5 +44,3 @@ class FireTruck {
       
     }     
 }
-
-Copy-pasterino above in umpleOnline for the graph

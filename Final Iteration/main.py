@@ -1,4 +1,4 @@
-from FireTruckNavigation import FireTruck
+from NavigationIteration1.FireTruckNavigation import FireTruck
 from libs.pathfinding import getRobotMovementList
 from utils.brick import Motor
 from utils.brick import wait_ready_sensors, EV3ColorSensor, EV3UltrasonicSensor, TouchSensor
@@ -10,12 +10,19 @@ color_left = EV3ColorSensor("1")
 color_right = EV3ColorSensor("2")
 spinner = Motor('B')
 pusher = Motor('C')
+ultrasonic_sensor = EV3UltrasonicSensor('3')
 
-FireTruck1 = FireTruck(motor_left, motor_right, color_left,color_right, spinner, pusher)
+wait_ready_sensors()
+
+
+print(ultrasonic_sensor.get_cm())
+FireTruck1 = FireTruck(motor_left, motor_right, color_left,
+                       color_right, spinner, pusher, ultrasonic_sensor)
 
 
 #path = getRobotMovementList((2, 2), "purple", (3, 3), "red", (3, 0), "green")
-path = getRobotMovementList((1, 0), "yellow", (1, 1), "orange", (0, 2), "blue")
+input("Enter to start pathfinding")
+path = getRobotMovementList((1, 1), "red", (2, 1), "purple", (3, 3), "green")
 
 FireTruck1.stop_motors()
 
